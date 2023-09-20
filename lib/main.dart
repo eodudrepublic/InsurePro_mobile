@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:insurepro_mobile/signin/login_ui.dart';
+import 'package:insurepro_mobile/signup/signup_ui.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,10 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'Flutter Demo',
-      home: Scaffold(
-        body: LogInUI(),
-      ),
+      home: SignUpUI(),
     );
   }
 }
