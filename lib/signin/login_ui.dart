@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:insurepro_mobile/find_id/find_id_ui.dart';
 import 'package:insurepro_mobile/signup/signup_ui.dart';
 
 class LogInUI extends StatefulWidget {
@@ -101,8 +102,7 @@ class _LogInUIState extends State<LogInUI> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => const Scaffold()), // Navigate to blank page
+                MaterialPageRoute(builder: (context) => const FindIDUI()),  // ID(email) 찾기 페이지로 이동 (뒤로 가기 가능)
               );
             },
             child: const Text('Forgot Username?'),
