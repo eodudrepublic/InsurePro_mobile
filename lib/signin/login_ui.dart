@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:insurepro_mobile/find_id/find_id_ui.dart';
 import 'package:insurepro_mobile/signup/signup_ui.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../_core/logo.dart';
+import '../_core/user.dart';
 
 class LogInUI extends StatefulWidget {
   const LogInUI({Key? key}) : super(key: key);
@@ -13,6 +15,59 @@ class LogInUI extends StatefulWidget {
 
 class _LogInUIState extends State<LogInUI> {
   bool checkBoxValue = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController pwController = TextEditingController();
+  final LocalAccountManager _localAccountManager = LocalAccountManager();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedData();  // 데이터를 로드합니다.
+  }
+
+  Future<void> _loadSavedData() async {
+    Map<String, dynamic> accountData = await _localAccountManager.selectData();
+    if (accountData['email']!.isNotEmpty && accountData['password']!.isNotEmpty) {
+      emailController.text = accountData['email'];
+      pwController.text = accountData['password'];
+    }
+  }
+
+  Future<void> _login() async {
+    var url = Uri.parse("http://3.38.101.62:8080/v1/login");
+    var response = await http.post(
+      url,
+      body: {
+        "email": emailController.text,
+        "password": pwController.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      if (checkBoxValue) {
+        // 체크박스가 선택되면, 계정 정보를 업데이트합니다.
+        await _localAccountManager.updateData(emailController.text, pwController.text);
+      }
+      var data = jsonDecode(response.body);
+      // 여기서 저장되는 user 정보를 앱 동작동안 사용 가능하도록 수정해야함
+      User user = User(
+        token: response.headers['Authorization'],
+        refreshToken: response.headers['Refresh'],
+        pk: data['pk'],
+        id: data['id'],
+        email: data['email'],
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Scaffold()),  // 로그인 후 빈 페이지로 이동
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${response.statusCode}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +81,9 @@ class _LogInUIState extends State<LogInUI> {
           const SizedBox(height: 20),
 
           // email 입력
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: emailController,
+            decoration: const InputDecoration(
               labelText: 'Email',
               border: OutlineInputBorder(),
             ),
@@ -35,8 +91,9 @@ class _LogInUIState extends State<LogInUI> {
           const SizedBox(height: 20),
 
           // password 입력
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: pwController,
+            decoration: const InputDecoration(
               labelText: 'Password',
               border: OutlineInputBorder(),
             ),
@@ -102,9 +159,7 @@ class _LogInUIState extends State<LogInUI> {
 
           // Sign in button
           ElevatedButton(
-            onPressed: () {
-              // 로그인 기능 구현
-            },
+            onPressed: _login,
             child: const Text('Sign In'),
           ),
         ],
