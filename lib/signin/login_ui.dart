@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:insurepro_mobile/find_id/find_id_ui.dart';
 import 'package:insurepro_mobile/signup/signup_ui.dart';
 
+import '../_core/logo.dart';
+
 class LogInUI extends StatefulWidget {
   const LogInUI({Key? key}) : super(key: key);
 
@@ -17,20 +19,10 @@ class _LogInUIState extends State<LogInUI> {
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,  // 중앙 정렬을 위한 속성
         children: [
           // logo
-          const Center(
-            child: Text(
-              'InsurePro',
-              style: TextStyle(
-                color: Color(0xFF175CD3),
-                fontSize: 28,
-                fontFamily: 'Product Sans',
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.18,
-              ),
-            ),
-          ),
+          const InsureProLogo(),
           const SizedBox(height: 20),
 
           // email 입력

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:insurepro_mobile/find_id/show_id_ui.dart';
+import '../_core/logo.dart';
 import '../signin/login_ui.dart';
 
 class FindIDUI extends StatefulWidget {
@@ -18,16 +19,7 @@ class _FindIDUIState extends State<FindIDUI> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // logo
-              const Text(
-                'InsurePro',
-                style: TextStyle(
-                  color: Color(0xFF175CD3),
-                  fontSize: 28,
-                  fontFamily: 'Product Sans',
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.18,
-                ),
-              ),
+              const InsureProLogo(),
               const SizedBox(height: 20),
 
               // to LogIn
