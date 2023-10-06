@@ -1,5 +1,9 @@
+import 'package:insurepro_mobile/_core/url.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LocalAccountManager {
   static final LocalAccountManager _instance = LocalAccountManager._(); // DBManager 클래스의 싱글톤 객체 생성
@@ -35,7 +39,7 @@ class LocalAccountManager {
             CREATE TABLE account(
               id INTEGER PRIMARY KEY, 
               email TEXT, 
-              password TEXT, 
+              password TEXT
             )
           ''',
           // id : 테이블의 기본 키, email : 이메일, password : 비밀번호
@@ -77,12 +81,93 @@ class LocalAccountManager {
   }
 }
 
-class User {
-  final String? token;
-  final String? refreshToken;
-  final String pk;
-  final String id;
-  final String email;
+class User with ChangeNotifier {
+  String? _token;
+  String? _refreshToken;
+  int? _pk;
+  String? _id;
+  String? _email;
 
-  User({this.token, this.refreshToken, required this.pk, required this.id, required this.email});
+  String? _name;
+  String? _team;
+
+  User({
+    String? token,
+    String? refreshToken,
+    int? pk,
+    String? id,
+    String? email,
+  })  : _token = token,
+        _refreshToken = refreshToken,
+        _pk = pk,
+        _id = id,
+        _email = email;
+
+  String? get token => _token;
+  String? get refreshToken => _refreshToken;
+  int? get pk => _pk;
+  String? get id => _id;
+  String? get email => _email;
+  String? get name => _name;
+  String? get team => _team;
+
+  // 사용자 정보 저장
+  void setToken(String? newToken) {
+    _token = newToken;
+    notifyListeners();
+  }
+  void setRefreshToken(String? newRefreshToken) {
+    _refreshToken = newRefreshToken;
+    notifyListeners();
+  }
+  void setPK(int newPK) {
+    _pk = newPK;
+    notifyListeners();
+  }
+  void setID(String newID) {
+    _id = newID;
+    notifyListeners();
+  }
+  void setEmail(String newEmail) {
+    _email = newEmail;
+    notifyListeners();
+  }
+  void setName(String newName) {
+    _name = newName;
+    notifyListeners();
+  }
+
+  void setTeam(String newTeam) {
+    _team = newTeam;
+    notifyListeners();
+  }
+
+  Future<void> fetchUserInfo() async {
+    if (_token == null) {
+      print("_token값이 없습니다!");
+      return;
+    }
+
+    var url = Uri.parse(URL.get_employee_url);
+    var response = await http.get(
+      url,
+      headers: {
+        "Authorization": _token!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var body = utf8.decode(response.bodyBytes);
+      var data = jsonDecode(body);
+
+      // 가져온 데이터를 사용하여 User 객체를 업데이트합니다.
+      setName(data['name']);
+      // print(data['name']);
+      setTeam(data['teamResponseDto']['teamName']);
+    } else {
+      print("Error: ${response.statusCode}");
+    }
+  }
+
+  // 추가적으로 필요한 메소드나 변수를 추가/수정할 수 있습니다.
 }

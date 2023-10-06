@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:insurepro_mobile/_core/url.dart';
 import 'package:insurepro_mobile/find_id/find_id_ui.dart';
+import 'package:insurepro_mobile/reset_pw/reset_pw_ui.dart';
 import 'package:insurepro_mobile/signup/signup_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import '../_core/logo.dart';
 import '../_core/user.dart';
+import 'login_success.dart';
 
 class LogInUI extends StatefulWidget {
   const LogInUI({Key? key}) : super(key: key);
@@ -34,13 +38,18 @@ class _LogInUIState extends State<LogInUI> {
   }
 
   Future<void> _login() async {
-    var url = Uri.parse("http://3.38.101.62:8080/v1/login");
+    var url = Uri.parse(URL.signin_url);
+    // print(emailController.text);
+    // print(pwController.text);
     var response = await http.post(
       url,
-      body: {
+      headers: {
+        'Content-Type': 'application/json',  // 추가한 헤더
+      },
+      body: jsonEncode({  // Map을 JSON 문자열로 변환
         "email": emailController.text,
         "password": pwController.text,
-      },
+      }),
     );
 
     if (response.statusCode == 200) {
@@ -49,21 +58,30 @@ class _LogInUIState extends State<LogInUI> {
         await _localAccountManager.updateData(emailController.text, pwController.text);
       }
       var data = jsonDecode(response.body);
+
       // 여기서 저장되는 user 정보를 앱 동작동안 사용 가능하도록 수정해야함
-      User user = User(
-        token: response.headers['Authorization'],
-        refreshToken: response.headers['Refresh'],
-        pk: data['pk'],
-        id: data['id'],
-        email: data['email'],
-      );
+      // User 객체를 현재 컨텍스트에서 불러옵니다.
+      User user = Provider.of<User>(context, listen: false);
+
+      // 로그인한 사용자 정보 저장
+      user.setToken(response.headers['authorization']);
+      // print(response.headers['authorization']);
+      user.setRefreshToken(response.headers['refresh']);
+      user.setPK(data['pk']);
+      user.setID(data['id']);
+      user.setEmail(data['email']);
+      user.fetchUserInfo();
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Scaffold()),  // 로그인 후 빈 페이지로 이동
+        MaterialPageRoute(
+          builder: (context) => LogInSuccess(user: user),
+        ),
       );
     } else {
+      print(response.body);
       ScaffoldMessenger.of(context).showSnackBar(
+        // 로그인 오류 메세지 좀 더 보기 좋게 ㄱㄱ
         SnackBar(content: Text('Error: ${response.statusCode}')),
       );
     }
@@ -140,7 +158,7 @@ class _LogInUIState extends State<LogInUI> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const Scaffold()), // Navigate to blank page
+                    builder: (context) => const ResetPWUI()),
               );
             },
             child: const Text('Forgot Password?'),

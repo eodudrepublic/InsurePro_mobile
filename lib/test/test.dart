@@ -1,69 +1,181 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:insurepro_mobile/_core/url.dart';
-import 'dart:convert';
+import 'package:flutter/services.dart';
+import '../_core/app_size.dart';
 
-import '../_core/team.dart';
-
-class TeamSelector extends StatefulWidget {
-  @override
-  _TeamSelectorState createState() => _TeamSelectorState();
-}
-
-class _TeamSelectorState extends State<TeamSelector> {
-  List<Team> teams = [];
-  Team? selectedTeam;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchTeams();
-  }
-
-  Future<void> _fetchTeams() async {
-    var url = Uri.parse(URL.team_url);
-    var response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      // UTF-8로 응답 바디를 디코드
-      final decodedData = utf8.decode(response.bodyBytes);
-      List<dynamic> body = jsonDecode(decodedData)['teams'];
-
-      setState(() {
-        teams = body.map((dynamic item) => Team.fromJson(item)).toList();
-        print(body); // 디코드된 데이터를 출력하여 확인
-      });
-    } else {
-      throw Exception('Failed to load teams');
-    }
-  }
+class TestScreen extends StatelessWidget {
+  const TestScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: const Text(
+          'Developing',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
         child: Column(
-          children: <Widget>[
-            DropdownButton<Team>(
-              hint: Text("Select a team"),
-              value: selectedTeam,
-              items: teams.map((Team team) {
-                return DropdownMenuItem<Team>(
-                  value: team,
-                  child: Text(team.teamName),
-                );
-              }).toList(),
-              onChanged: (Team? newValue) {
-                setState(() {
-                  selectedTeam = newValue!;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            Text("Selected Team: ${selectedTeam?.teamName ?? "None"}"),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 회원가입 & 로그인
+            _category(title: '회원가입 & 로그인', widgets: [
+              _item(
+                context: context,
+                content: '로그인',
+                namedRouter: '/Sign/LogIn',
+                isPost: true,
+              ),
+              _item(
+                context: context,
+                content: '로그인 성공',
+                namedRouter: '/Sign/LogInSuccess',
+                isPost: true,
+              ),
+              _item(
+                context: context,
+                content: '회원가입',
+                namedRouter: '/Sign/SignUp',
+                isPost: true,
+              ),
+              _item(
+                context: context,
+                content: '팀선택 (test)',
+                namedRouter: '/Sign/SelectTeamTest',
+                isPost: true,
+              ),
+              _item(
+                context: context,
+                content: 'ID 찾기',
+                namedRouter: '/Sign/FindID',
+                isPost: true,
+              ),
+              _item(
+                context: context,
+                content: 'ID 보여주기 (test)',
+                namedRouter: '/Sign/ShowID',
+                isPost: true,
+              ),
+              _item(
+                context: context,
+                content: '비밀번호 리셋',
+                namedRouter: '/Sign/ResetPW',
+              ),
+              _item(
+                context: context,
+                content: '비밀번호 보여주기 (test)',
+                namedRouter: '/Sign/ShowPW',
+              ),
+            ]),
+
+            // 메인 동작부
+            _category(title: "Main Page", widgets: [
+              _item(
+                length: 1,
+                context: context,
+                content: '메인 화면',
+                namedRouter: '/Main/MainPage',
+              ),
+              _item(
+                length: 3,
+                context: context,
+                content: '고객 DB 화면',
+                namedRouter: '/Main/CustomerDBUI',
+              ),
+              _item(
+                length: 3,
+                context: context,
+                content: '팀 플래너 화면',
+                namedRouter: '/Main/PlannerUI',
+              ),
+              _item(
+                length: 3,
+                context: context,
+                content: '마이 페이지 화면',
+                namedRouter: '/Main/MyPageUI',
+              ),
+            ]),
+            const SizedBox(height: 40),
           ],
         ),
+      ),
+    );
+  }
+
+  IgnorePointer _item({
+    required BuildContext context,
+    required String content,
+    String? namedRouter,
+    int length = 2,
+    bool isPost = false,
+  }) {
+    return IgnorePointer(
+      ignoring: namedRouter == null,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          if (namedRouter != null) {
+            Navigator.of(context).pushNamed(namedRouter);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Container(
+            width: length == 1
+                ? size.width
+                : length == 2
+                ? (size.width / 2) - (50 / 2)
+                : length == 3
+                ? (size.width / 3) - (60 / 3)
+                : size.width,
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: namedRouter != null
+                  ? (isPost
+                  ? Colors.green
+                  : const Color.fromRGBO(125, 125, 125, 1))
+                  : const Color.fromRGBO(61, 61, 61, 1),
+            ),
+            child: Center(
+              child: Text(
+                content,
+                style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: namedRouter != null
+                        ? const Color.fromRGBO(215, 215, 215, 1)
+                        : const Color.fromRGBO(155, 155, 155, 1)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding _category({
+    required String title,
+    required List<Widget> widgets,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          Wrap(
+            spacing: 10,
+            children: [...widgets],
+          ),
+        ],
       ),
     );
   }
