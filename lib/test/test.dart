@@ -97,6 +97,23 @@ class TestScreen extends StatelessWidget {
                 content: '마이 페이지 화면',
                 namedRouter: '/Main/MyPageUI',
               ),
+              _item(
+                length: 3,
+                context: context,
+                content: '고객 추가 창',
+                namedRouter: '/Main/AddCustomerUI',
+                isPost: true,
+              ),
+            ]),
+
+            _category(title: "Making", widgets: [
+              _item(
+                length: 1,
+                context: context,
+                content: '만들고 있는중',
+                namedRouter: '/Test/Making',
+                // isPost: true,
+              ),
             ]),
             const SizedBox(height: 40),
           ],

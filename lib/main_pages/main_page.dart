@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:insurepro_mobile/_core/app_color.dart';
 import 'planner/planner_main_ui.dart';
 import 'customer_db/customer_db_ui.dart';
 import 'my_page/mypage_ui.dart';
@@ -24,10 +25,10 @@ class _MainPagesState extends State<MainPages> {
     return Scaffold(
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFF175CD3),  // BottomNavigationBar의 배경색 설정
+        backgroundColor: main_color,  // BottomNavigationBar의 배경색 설정
         currentIndex: _currentIndex,
-        selectedItemColor: Colors.white,  // 선택된 아이콘의 색상 설정
-        unselectedItemColor: Colors.grey,  // 선택되지 않은 아이콘의 색상 설정
+        selectedItemColor: selected_bottom_menu,  // 선택된 아이콘의 색상 설정
+        unselectedItemColor: unselected_bottom_menu,  // 선택되지 않은 아이콘의 색상 설정
         showSelectedLabels: false,  // label 가리기
         showUnselectedLabels: false,  // label 가리기
         onTap: (index) {

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:insurepro_mobile/_core/app_size.dart';
+import 'package:insurepro_mobile/_core/text_field.dart';
 import 'package:insurepro_mobile/_core/url.dart';
 import 'package:insurepro_mobile/signin/login_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:insurepro_mobile/signup/select_team.dart';
 import 'dart:convert';
+import '../_core/app_color.dart';
 import '../_core/logo.dart';
 
 class SignUpUI extends StatefulWidget {
@@ -22,7 +25,6 @@ class _SignUpUIState extends State<SignUpUI> {
   TextEditingController repwController = TextEditingController();
   String emailResponseMessage = '';
   String codeResponseMessage = '';
-  bool _obscureText = true;
   bool isNextButtonEnabled = false; // '다음' 버튼 활성화 여부를 위한 변수
 
   @override
@@ -32,6 +34,8 @@ class _SignUpUIState extends State<SignUpUI> {
     idNumController.addListener(validateForm);
     pwController.addListener(validateForm);
     repwController.addListener(validateForm);
+    emailController.addListener(() => setState(() {})); // 리스너 추가
+    authCodeController.addListener(() => setState(() {})); // 리스너 추가
   }
 
   // 인증 메일 보내는 함수
@@ -89,172 +93,182 @@ class _SignUpUIState extends State<SignUpUI> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // logo
-              const InsureProLogo(),
-              const SizedBox(height: 20),
-
-              // to Login
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+          child: Center(
+            child: SizedBox(
+              width: app_width * 0.75,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('이미 회원이신가요?'),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LogInUI()),  // LogInUI는 로그인 화면의 위젯입니다.
+                  // logo
+                  const InsureProLogo(),
+                  const SizedBox(height: 20),
+
+                  // to Login
+                  Center(
+                    child: Column(
+                      children: [
+                        const Text('이미 회원이신가요?'),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const LogInUI()),  // LogInUI는 로그인 화면의 위젯입니다.
+                            );
+                          },
+                          child: const Text('여기서 로그인하기!'),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // 이름 입력
+                  CustomTextField(
+                    controller: nameController,
+                    iconData: Icons.person_rounded,
+                    hintText: 'User Name',
+                    onChanged: (_) => validateForm(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 사번 입력
+                  CustomTextField(
+                    controller: idNumController,
+                    iconData: Icons.person_rounded,
+                    hintText: 'User Number',
+                    onChanged: (_) => validateForm(),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 이메일 입력 -> 인증
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          controller: emailController,
+                          iconData: Icons.email_outlined,
+                          hintText: 'example@gmail.com',
+                          onChanged: (_) {},
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: emailController.text.contains('@') && emailController.text.contains('.')
+                            ? sendAuthEmail : null,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              return (emailController.text.contains('@') && emailController.text.contains('.'))
+                                ? main_color : disabled_gray;
+                            }
+                          )
+                        ),
+                        child: const Text('코드 전송'),
+                      ),
+
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 인증 코드 입력
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          controller: authCodeController,
+                          iconData: Icons.email_outlined,
+                          hintText: '인증 코드를 입력해주세요',
+                          onChanged: (_) {},
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: authCodeController.text.isNotEmpty ? checkAuthCode : null,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              return authCodeController.text.isNotEmpty
+                                ? main_color : disabled_gray;
+                            }
+                          )
+                        ),
+                        child: const Text('확인'),
+                      ),
+
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 비밀번호 입력
+                  CustomPwField(
+                    controller: pwController,
+                    iconData: Icons.lock_outlined,
+                    hintText: 'Password',
+                    onChanged: (_) => validateForm(),
+                    isError: pwController.text.length <= 8,
+                    errorMessage: '* 비밀번호는 8자 이상으로 설정해주세요.',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 비밀번호 확인
+                  CustomPwField(
+                    controller: repwController,
+                    iconData: Icons.lock_outlined,
+                    hintText: 'Verify Password',
+                    onChanged: (_) => validateForm(),
+                    isError: pwController.text != repwController.text,
+                    errorMessage: '비밀번호가 다릅니다!',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 다음 페이지 (팀 선택 화면으로 넘어가는 버튼)
+                SizedBox(
+                  width: app_width * 0.75,
+                  child: ElevatedButton(
+                    onPressed: isNextButtonEnabled ? () {
+                      Navigator.push(context,
+                        MaterialPageRoute(
+                          builder: (context) => SelectTeamPage(
+                            name: nameController.text,
+                            idNumber: idNumController.text,
+                            email: emailController.text,
+                            authCode: authCodeController.text,
+                            password: pwController.text,
+                            repassword: repwController.text,
+                          ),
+                        ),
                       );
-                    },
-                    child: const Text('여기서 로그인하기!'),
+                    } : null,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.disabled)) {
+                                return disabled_gray;
+                              }
+                              return main_color;
+                            }
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),  // 둥근 모서리 지정
+                            )
+                        )
+                    ),
+                    child: const Text('다음'),
                   ),
+                ),
+
+                  // 인증을 위한 임시 출력 -> 배포할때 없앨것
+                  const SizedBox(height: 30),
+                  Text(emailResponseMessage),
+                  const SizedBox(height: 5),
+                  Text(codeResponseMessage),
                 ],
               ),
-
-              // 이름 입력
-              TextField(
-                controller: nameController,
-                onChanged: (_) => validateForm(),
-                decoration: const InputDecoration(
-                  labelText: '이름 입력하기',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 사번 입력
-              TextField(
-                controller: idNumController,
-                onChanged: (_) => validateForm(),
-                decoration: const InputDecoration(
-                  labelText: '사번 입력하기',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 이메일 입력 -> 인증
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: emailController,
-                      decoration: const InputDecoration(
-                        labelText: '이메일 입력하기',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: sendAuthEmail, // 1. 인증 이메일 보내는 코드
-                    child: const Text('코드 전송'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // 인증 코드 입력
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: authCodeController,
-                      decoration: const InputDecoration(
-                        labelText: '인증 코드 입력하기',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: checkAuthCode, // 2. 코드 인증 기능
-                    child: const Text('확인'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // 비밀번호 입력
-              TextField(
-                controller: pwController,
-                onChanged: (_) => validateForm(),
-                decoration: InputDecoration(
-                  labelText: '비밀번호 입력하기',
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  ),
-                ),
-                obscureText: _obscureText,
-              ),
-              const SizedBox(height: 16),
-
-              // 비밀번호 확인
-              TextField(
-                controller: repwController,
-                onChanged: (_) => validateForm(), // 비밀번호 확인 값이 변경되면 폼 유효성 검사
-                decoration: InputDecoration(
-                  labelText: '비밀번호 확인',
-                  border: OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureText = !_obscureText;
-                      });
-                    },
-                  ),
-                  errorText: pwController.text != repwController.text
-                      ? '비밀번호가 다릅니다!'
-                      : null, // 조건에 따라 에러 텍스트 표시
-                ),
-                obscureText: _obscureText,
-              ),
-              const SizedBox(height: 16),
-
-              // 다음 페이지 (팀 선택 화면으로 넘어가는 버튼)
-              ElevatedButton(
-                onPressed: isNextButtonEnabled // 버튼 활성화 여부 체크
-                    ? () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SelectTeamPage(
-                        name: nameController.text,
-                        idNumber: idNumController.text,
-                        email: emailController.text,
-                        authCode: authCodeController.text,
-                        password: pwController.text,
-                        repassword: repwController.text,
-                      ),
-                    ),
-                  );
-                }
-                    : null,
-                child: const Text('다음'),
-              ),
-
-              // 인증을 위한 임시 출력 -> 배포할때 없앨것
-              const SizedBox(height: 30),
-              Text(emailResponseMessage),
-              const SizedBox(height: 5),
-              Text(codeResponseMessage),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+
