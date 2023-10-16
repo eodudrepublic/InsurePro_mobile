@@ -6,7 +6,7 @@ import 'package:insurepro_mobile/main_pages/customer_db/add_customer.dart';
 import 'package:insurepro_mobile/main_pages/customer_db/customer_db_ui.dart';
 import 'package:insurepro_mobile/main_pages/main_page.dart';
 import 'package:insurepro_mobile/main_pages/my_page/mypage_ui.dart';
-import 'package:insurepro_mobile/main_pages/planner/planner_main_ui.dart';
+import 'package:insurepro_mobile/main_pages/planner/team_planner.dart';
 import 'package:insurepro_mobile/reset_pw/reset_pw_ui.dart';
 import 'package:insurepro_mobile/reset_pw/show_pw_ui.dart';
 import 'package:insurepro_mobile/signin/login_success.dart';

@@ -97,112 +97,142 @@ class _LogInUIState extends State<LogInUI> {
     return Scaffold(
       body: Center(
         child: SizedBox(
-          width: app_width * 0.75,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,  // 중앙 정렬을 위한 속성
-            children: [
-              // logo
-              const InsureProLogo(),
-              const SizedBox(height: 20),
+          width: app_width * 0.67,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,  // 중앙 정렬을 위한 속성
+              children: [
+                // logo
+                const InsureProLogo(),
+                const SizedBox(height: 60),
 
-              // email 입력
-              CustomTextField(
-                controller: emailController,
-                iconData: Icons.email_outlined,
-                hintText: '이메일 입력하기',
-                onChanged: (_) {},
-              ),
-              const SizedBox(height: 20),
+                // email 입력
+                CustomTextField(
+                  controller: emailController,
+                  iconData: Icons.email_outlined,
+                  hintText: '이메일 입력하기',
+                  onChanged: (_) {},
+                ),
+                const SizedBox(height: 40),
 
-              // password 입력
-              CustomPwField(
-                controller: pwController,
-                iconData: Icons.lock_outlined,
-                hintText: 'Password',
-                onChanged: (_) {},
-              ),
-              const SizedBox(height: 20),
+                // password 입력
+                CustomPwField(
+                  controller: pwController,
+                  iconData: Icons.lock_outlined,
+                  hintText: 'Password',
+                  onChanged: (_) {},
+                ),
+                const SizedBox(height: 20),
 
-              // 계정 저장 체크
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Checkbox(
-                    value: checkBoxValue,
-                    // 내부 저장소? 이용해서 계정 저장하도록 구현
-                    onChanged: (bool? value) {
-                      setState(() {
-                        checkBoxValue = value!;
-                      });
-                    },
-                  ),
-                  const Text('다음에도 기억하기'),
-                ],
-              ),
+                // 계정 저장 체크
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: checkBoxValue,
+                      // 내부 저장소? 이용해서 계정 저장하도록 구현
+                      onChanged: (bool? value) {
+                        setState(() {
+                          checkBoxValue = value!;
+                        });
+                      },
+                    ),
+                    const Text('다음에도 기억하기'),
+                  ],
+                ),
 
-              // to Sign up
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('아직 계정이 없으신가요?'),
-                  TextButton(
+                // to Sign up
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('아직 계정이 없으신가요?'),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignUpUI()),  // SignUpUI는 회원가입 화면의 위젯입니다.
+                        );
+                      },
+                      child: const Text('회원가입 하러가기'),
+                    ),
+                  ],
+                ),
+
+                // 이메일 찾기
+                SizedBox(
+                  height: 24,
+                  child: TextButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SignUpUI()),  // SignUpUI는 회원가입 화면의 위젯입니다.
+                        MaterialPageRoute(builder: (context) => const FindIDUI()),  // ID(email) 찾기 페이지로 이동 (뒤로 가기 가능)
                       );
                     },
-                    child: const Text('회원가입 하러가기'),
-                  ),
-                ],
-              ),
-
-              // 비밀번호 찾기
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ResetPWUI()),
-                  );
-                },
-                child: const Text('아이디 찾기'),
-              ),
-
-              // 이메일 찾기
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FindIDUI()),  // ID(email) 찾기 페이지로 이동 (뒤로 가기 가능)
-                  );
-                },
-                child: const Text('비밀번호 찾기'),
-              ),
-
-              // Sign in button
-              ElevatedButton(
-                onPressed: (emailController.text.isNotEmpty && pwController.text.isNotEmpty)
-                    ? _login : null,
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.disabled)) {
-                        return disabled_gray;
-                      }
-                      return main_color;
-                    }
-                  ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),  // 둥근 모서리 지정
-                      )
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                    ),
+                    child: const Text(
+                      '아이디 찾기',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ),
-                child: const Text('Sign In'),
-              ),
-            ],
+
+                // 비밀번호 찾기
+                SizedBox(
+                  height: 24,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ResetPWUI()),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+                    ),
+                    child: const Text(
+                      '비밀번호 찾기',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Sign in button
+                const SizedBox(height: 45),
+                SizedBox(
+                  height: 53,
+                  child: ElevatedButton(
+                    onPressed: (emailController.text.isNotEmpty && pwController.text.isNotEmpty)
+                        ? _login : null,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.disabled)) {
+                            return disabled_gray;
+                          }
+                          return main_color;
+                        }
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),  // 둥근 모서리 지정
+                          )
+                      ),
+                    ),
+                    child: const Text('Sign In'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

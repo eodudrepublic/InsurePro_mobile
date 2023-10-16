@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../_core/app_size.dart';
 
+// 테스트용 토큰 저장
+class TestToken {
+  static const testToken = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIiwiVVNFUiJdLCJpZCI6IjIwMjA1NTUxMyIsInN1YiI6InRlc3RAZ21haWwuY29tIiwiaWF0IjoxNjk3MTc5MDAzLCJleHAiOjE2OTc3NzkwMDN9.sIAMRqZheAVXh06ixfRBL2T8m6jrtz-dYj7sbuqz5wg';
+}
+
 class TestScreen extends StatelessWidget {
   const TestScreen({super.key});
 
@@ -78,24 +83,28 @@ class TestScreen extends StatelessWidget {
                 context: context,
                 content: '메인 화면',
                 namedRouter: '/Main/MainPage',
+                isPost: true,
               ),
               _item(
                 length: 3,
                 context: context,
                 content: '고객 DB 화면',
                 namedRouter: '/Main/CustomerDBUI',
+                isPost: true,
               ),
               _item(
                 length: 3,
                 context: context,
                 content: '팀 플래너 화면',
                 namedRouter: '/Main/PlannerUI',
+                isPost: true,
               ),
               _item(
                 length: 3,
                 context: context,
                 content: '마이 페이지 화면',
                 namedRouter: '/Main/MyPageUI',
+                isPost: true,
               ),
               _item(
                 length: 3,

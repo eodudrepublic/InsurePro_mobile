@@ -5,11 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:insurepro_mobile/_core/app_size.dart';
 import 'package:insurepro_mobile/_core/url.dart';
 import 'package:provider/provider.dart';
-
 import '../../_core/app_color.dart';
 import '../../_core/logo.dart';
 import '../../_core/user.dart';
-import 'my_planner_list.dart';
+import 'my_planner.dart';
 
 class TeamPlanner extends StatefulWidget {
   const TeamPlanner({super.key});
@@ -78,7 +77,7 @@ class _TeamPlannerState extends State<TeamPlanner> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const MyPlanners()),
+                                      MaterialPageRoute(builder: (context) => const MyPlanner()),
                                     );
                                   },
                                   child: const Icon(Icons.format_list_bulleted_rounded),
@@ -94,11 +93,11 @@ class _TeamPlannerState extends State<TeamPlanner> {
                                     color: Color(0xff000000),
                                   ),
                                   textAlign: TextAlign.left,
-                                ),
+                                ), // 투명도 70%으로 수정
 
                                 // 텍스트와 오른쪽 아이콘 사이의 늘어나는 간격
                                 const Spacer(),
-                                Icon(
+                                Icon( // 아이콘 사이즈 24로
                                   Icons.add_circle_sharp,
                                   color: main_color,
                                 ),
@@ -136,7 +135,7 @@ class _TeamPlannerState extends State<TeamPlanner> {
                         height: 24/24,
                       ),
                       textAlign: TextAlign.left,
-                    ),
+                    ),  // 투명도 70%으로 수정
                     SizedBox(
                       height: 150,
                       child: ListView.builder(
@@ -187,7 +186,6 @@ class _TeamPlannerState extends State<TeamPlanner> {
       ),
     );
   }
-
 }
 
 class FullScreenImagePage extends StatelessWidget {

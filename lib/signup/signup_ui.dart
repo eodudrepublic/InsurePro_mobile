@@ -24,7 +24,9 @@ class _SignUpUIState extends State<SignUpUI> {
   TextEditingController pwController = TextEditingController();
   TextEditingController repwController = TextEditingController();
   String emailResponseMessage = '';
+  FocusNode emailFocusNode = FocusNode();
   String codeResponseMessage = '';
+  FocusNode codeFocusNode = FocusNode();
   bool isNextButtonEnabled = false; // '다음' 버튼 활성화 여부를 위한 변수
 
   @override
@@ -35,7 +37,9 @@ class _SignUpUIState extends State<SignUpUI> {
     pwController.addListener(validateForm);
     repwController.addListener(validateForm);
     emailController.addListener(() => setState(() {})); // 리스너 추가
-    authCodeController.addListener(() => setState(() {})); // 리스너 추가
+    emailFocusNode.addListener(() => setState(() {}));
+    authCodeController.addListener(() => setState(() {}));
+    codeFocusNode.addListener(() => setState(() {}));
   }
 
   // 인증 메일 보내는 함수
@@ -88,26 +92,40 @@ class _SignUpUIState extends State<SignUpUI> {
   }
 
   @override
+  void dispose() {
+    emailFocusNode.dispose();
+    codeFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
             child: SizedBox(
-              width: app_width * 0.75,
+              width: app_width * 0.67,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // logo
-                  const InsureProLogo(),
                   const SizedBox(height: 20),
+                  const InsureProLogo(),
+                  const SizedBox(height: 24),
 
-                  // to Login
+                  // to Login -> 줄 간격 맞춰야함
                   Center(
                     child: Column(
                       children: [
-                        const Text('이미 회원이신가요?'),
+                        const Text(
+                          '이미 회원이신가요?',
+                          style: TextStyle(
+                            fontSize: 12,
+                            height: 0.1,
+                          ),
+                        ),
                         TextButton(
                           onPressed: () {
                             Navigator.pushReplacement(
@@ -115,114 +133,148 @@ class _SignUpUIState extends State<SignUpUI> {
                               MaterialPageRoute(builder: (context) => const LogInUI()),  // LogInUI는 로그인 화면의 위젯입니다.
                             );
                           },
-                          child: const Text('여기서 로그인하기!'),
+                          child: const Text(
+                            '여기서 로그인하기!',
+                            style: TextStyle(
+                              fontSize: 12,
+                              height: 0.1,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  // 이름 입력
-                  CustomTextField(
-                    controller: nameController,
-                    iconData: Icons.person_rounded,
-                    hintText: 'User Name',
-                    onChanged: (_) => validateForm(),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 사번 입력
-                  CustomTextField(
-                    controller: idNumController,
-                    iconData: Icons.person_rounded,
-                    hintText: 'User Number',
-                    onChanged: (_) => validateForm(),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 이메일 입력 -> 인증
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomTextField(
-                          controller: emailController,
-                          iconData: Icons.email_outlined,
-                          hintText: 'example@gmail.com',
-                          onChanged: (_) {},
+                  Padding(
+                    padding: EdgeInsets.all(13),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // 이름 입력
+                        SizedBox(height: 11),
+                        CustomTextField(
+                          controller: nameController,
+                          iconData: Icons.person_rounded,
+                          hintText: 'User Name',
+                          onChanged: (_) => validateForm(),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: emailController.text.contains('@') && emailController.text.contains('.')
-                            ? sendAuthEmail : null,
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return (emailController.text.contains('@') && emailController.text.contains('.'))
-                                ? main_color : disabled_gray;
-                            }
-                          )
+                        const SizedBox(height: 40),
+
+                        // 사번 입력
+                        CustomTextField(
+                          controller: idNumController,
+                          iconData: Icons.person_rounded,
+                          hintText: 'User Number',
+                          onChanged: (_) => validateForm(),
                         ),
-                        child: const Text('코드 전송'),
-                      ),
+                        const SizedBox(height: 40),
 
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 인증 코드 입력
-                  Row(
-                    children: [
-                      Expanded(
-                        child: CustomTextField(
-                          controller: authCodeController,
-                          iconData: Icons.email_outlined,
-                          hintText: '인증 코드를 입력해주세요',
-                          onChanged: (_) {},
+                        // 이메일 입력 -> 인증
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextField(
+                                controller: emailController,
+                                iconData: Icons.email_outlined,
+                                hintText: 'example@gmail.com',
+                                onChanged: (_) {},
+                                focusNode: emailFocusNode,
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: emailFocusNode.hasFocus // 포커스 상태에 따라 색상을 변경합니다.
+                                        ? Colors.black : Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: emailController.text.contains('@') && emailController.text.contains('.')
+                                    ? sendAuthEmail : null,
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                            (Set<MaterialState> states) {
+                                          return (emailController.text.contains('@') && emailController.text.contains('.'))
+                                              ? main_color : disabled_gray;
+                                        }
+                                    )
+                                ),
+                                child: const Text('코드 전송'),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: authCodeController.text.isNotEmpty ? checkAuthCode : null,
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return authCodeController.text.isNotEmpty
-                                ? main_color : disabled_gray;
-                            }
-                          )
+                        const SizedBox(height: 40),
+
+                        // 인증 코드 입력
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextField(
+                                controller: authCodeController,
+                                iconData: Icons.email_outlined,
+                                hintText: '인증 코드를 입력해주세요',
+                                onChanged: (_) {},
+                                focusNode: codeFocusNode,
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: codeFocusNode.hasFocus // 포커스 상태에 따라 색상을 변경합니다.
+                                        ? Colors.black : Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: authCodeController.text.isNotEmpty ? checkAuthCode : null,
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                      return authCodeController.text.isNotEmpty
+                                          ? main_color : disabled_gray;
+                                    },
+                                  ),
+                                ),
+                                child: const Text('확인'),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Text('확인'),
-                      ),
+                        const SizedBox(height: 40),
 
-                    ],
+                        // 비밀번호 입력
+                        CustomPwField(
+                          controller: pwController,
+                          iconData: Icons.lock_outlined,
+                          hintText: 'Password',
+                          onChanged: (_) => validateForm(),
+                          isError: pwController.text.length <= 8,
+                          errorMessage: '* 비밀번호는 8자 이상으로 설정해주세요.',
+                        ),
+                        const SizedBox(height: 40),
+
+                        // 비밀번호 확인
+                        CustomPwField(
+                          controller: repwController,
+                          iconData: Icons.lock_outlined,
+                          hintText: 'Verify Password',
+                          onChanged: (_) => validateForm(),
+                          isError: pwController.text != repwController.text,
+                          errorMessage: '비밀번호가 다릅니다!',
+                        ),
+                        const SizedBox(height: 35),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
 
-                  // 비밀번호 입력
-                  CustomPwField(
-                    controller: pwController,
-                    iconData: Icons.lock_outlined,
-                    hintText: 'Password',
-                    onChanged: (_) => validateForm(),
-                    isError: pwController.text.length <= 8,
-                    errorMessage: '* 비밀번호는 8자 이상으로 설정해주세요.',
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 비밀번호 확인
-                  CustomPwField(
-                    controller: repwController,
-                    iconData: Icons.lock_outlined,
-                    hintText: 'Verify Password',
-                    onChanged: (_) => validateForm(),
-                    isError: pwController.text != repwController.text,
-                    errorMessage: '비밀번호가 다릅니다!',
-                  ),
-                  const SizedBox(height: 16),
-
-                  // 다음 페이지 (팀 선택 화면으로 넘어가는 버튼)
+                // 다음 페이지 (팀 선택 화면으로 넘어가는 버튼)
                 SizedBox(
-                  width: app_width * 0.75,
+                  height: 53,
                   child: ElevatedButton(
                     onPressed: isNextButtonEnabled ? () {
                       Navigator.push(context,

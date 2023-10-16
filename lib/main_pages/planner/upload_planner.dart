@@ -1,25 +1,17 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
-import 'package:insurepro_mobile/_core/app_color.dart';
-import 'package:insurepro_mobile/_core/app_size.dart';
-import 'package:insurepro_mobile/_core/logo.dart';
-import 'package:insurepro_mobile/test/test.dart';
-import 'package:provider/provider.dart';
-import '../_core/user.dart';
-import 'package:http_parser/http_parser.dart';
 
-class TestMaking extends StatefulWidget {
-  const TestMaking({super.key});
+class UploadPlanner extends StatefulWidget {
+  const UploadPlanner({super.key});
 
   @override
-  _TestMakingState createState() => _TestMakingState();
+  _UploadPlannerState createState() => _UploadPlannerState();
 }
 
-class _TestMakingState extends State<TestMaking> {
+class _UploadPlannerState extends State<UploadPlanner> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
   // base64 문자열을 저장할 상태 변수 추가

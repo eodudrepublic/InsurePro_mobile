@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:insurepro_mobile/_core/app_size.dart';
 import 'package:insurepro_mobile/_core/url.dart';
 import 'dart:convert';
+import '../_core/app_color.dart';
 import '../_core/logo.dart';
 import '../_core/team.dart';
 import '../signin/login_ui.dart';
@@ -84,44 +86,137 @@ class _SelectTeamPageState extends State<SelectTeamPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          width: app_width * 0.67,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,  // 중앙 정렬을 위한 속성
             children: [
               // logo
               const InsureProLogo(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-              DropdownButton<Team>(
-                hint: const Text("팀을 선택하세요"),
-                value: selectedTeam,
-                items: teams.map((Team team) {
-                  return DropdownMenuItem<Team>(
-                    value: team,
-                    child: Text(team.teamName),
-                  );
-                }).toList(),
-                onChanged: (Team? newValue) {
-                  setState(() {
-                    selectedTeam = newValue;
-                    if (newValue != null) {
-                      isButtonEnabled = true;
-                    } else {
-                      isButtonEnabled = false;
-                    }
-                  });
-                },
+              // 이전으로 돌아가기 버튼
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_sharp,
+                      color: Colors.black,
+                      size: 11,
+                    ),
+                    label: const Text(
+                      '이전으로 돌아가기',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                      )
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
               ),
-              // SizedBox(height: 20),
-              // Text("선택한 팀: ${selectedTeam?.teamName ?? "선택되지 않음"}"),
-              // SizedBox(height: 20),
-              // Text("선택한 팀의 pk: ${selectedTeam?.pk ?? "None"}"),  // Here's the line displaying the pk of the selected team.
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isButtonEnabled ? _signUp : null,
-                child: const Text("가입하기"),
+
+              const SizedBox(height: 35),
+              Padding(
+                padding: const EdgeInsets.all(13),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      "Team Name",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: disabled_gray,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButton<Team>(
+                      isExpanded: true, // 전체 너비 사용
+                      alignment: Alignment.centerRight,
+                      hint: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "팀을 선택하세요",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      value: selectedTeam,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down_sharp,
+                        color: Colors.black,
+                        size: 24,
+                      ),
+                      underline: Container(
+                        height: 1,
+                        color: Colors.black,
+                      ),
+                      dropdownColor: Colors.white,
+                      items: teams.map((Team team) {
+                        return DropdownMenuItem<Team>(
+                          value: team,
+                          child: Text(
+                            team.teamName,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (Team? newValue) {
+                        setState(() {
+                          selectedTeam = newValue;
+                          if (newValue != null) {
+                            isButtonEnabled = true;
+                          } else {
+                            isButtonEnabled = false;
+                          }
+                        });
+                      },
+                    ),
+                    // SizedBox(height: 20),
+                    // Text("선택한 팀: ${selectedTeam?.teamName ?? "선택되지 않음"}"),
+                    // SizedBox(height: 20),
+                    // Text("선택한 팀의 pk: ${selectedTeam?.pk ?? "None"}"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 35),
+
+              SizedBox(
+                height: 53,
+                child: ElevatedButton(
+                  onPressed: isButtonEnabled ? _signUp : null,
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return disabled_gray;
+                        }
+                        return main_color;
+                      }
+                    ),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),  // 둥근 모서리 지정
+                        )
+                    ),
+                  ),
+                  child: const Text('가입하기'),
+                ),
               ),
             ],
           ),

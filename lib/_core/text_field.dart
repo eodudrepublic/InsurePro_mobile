@@ -6,6 +6,7 @@ class CustomTextField extends StatefulWidget {
   final IconData iconData;
   final String hintText;
   final ValueChanged<String>? onChanged; // 콜백을 추가합니다
+  final FocusNode? focusNode;
 
   const CustomTextField({
     Key? key,
@@ -13,6 +14,7 @@ class CustomTextField extends StatefulWidget {
     this.iconData = Icons.person_rounded,
     this.hintText = 'User Name',
     this.onChanged, // 콜백을 초기화합니다
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -43,6 +45,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           widget.onChanged!(text); // 콜백을 호출합니다
         }
       },
+      focusNode: widget.focusNode,
       decoration: InputDecoration(
         prefixIcon: Icon(
           widget.iconData,
